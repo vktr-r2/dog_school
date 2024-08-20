@@ -28,26 +28,26 @@ class Dog:
 
 class DogSchool:
     trick_classes: list[Trick]
-    studants: dict[int, Dog]
+    students: dict[int, Dog]
 
     def __init__(self, tricks: list[Trick]):
         self.trick_classes = tricks
-        self.studants = {}
+        self.students = {}
 
     def teach(self, dog: Dog) -> int:
-        dog_number = self.__add_studant(dog)
+        dog_number = self.__add_student(dog)
         for t in self.trick_classes:
             dog.learn_trick(t)
         return dog_number
 
-    def __add_studant(self, dog) -> int:
-        number = max(self.studants.keys(), default=1)
-        self.studants[number] = dog
+    def __add_student(self, dog) -> int:
+        number = max(self.students.keys(), default=1)
+        self.students[number] = dog
         return number
 
     def get_student_by_number(self, number: int):
         try:
-            return self.studants[number]
+            return self.students[number]
         except KeyError:
             raise ValueError(f"There is no Dog with number {number}")
 

@@ -41,11 +41,11 @@ class TestTricks(TestCase):
             f"look, {self.dog} caught a beautiful stick"
         )
 
-    def test_get_studant_by_number(self):
+    def test_get_student_by_number(self):
         dog_school = DogSchool(tricks=[])
         dog_school.teach(self.dog)
 
-        self.assertEqual(dog_school.studants, {1: self.dog})
+        self.assertEqual(dog_school.students, {1: self.dog})
         self.assertEqual(dog_school.get_student_by_number(1), self.dog)
         with self.assertRaises(ValueError):
             dog_school.get_student_by_number(999)
