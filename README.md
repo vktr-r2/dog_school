@@ -10,6 +10,7 @@ $ poetry run python dog_school/main.py
 woof woof
 look, <Fluffy, the dog> is dead
 look, <Fluffy, the dog> caught some stick
+<Fluffy, the dog>
 ```
 
 # Run tests

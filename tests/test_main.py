@@ -27,7 +27,7 @@ class TestTricks(TestCase):
         self.dog.perform_trick(FakeDead.name)
         self.mock_output.assert_called_once_with(f"look, {self.dog} is dead")
 
-    def test_dog_school(self):
+    def test_dog_school__teaches(self):
         dog_school = DogSchool(tricks=[FakeDead, CatchStick])
         dog_school.teach(self.dog)
 
@@ -40,3 +40,12 @@ class TestTricks(TestCase):
         self.mock_output.assert_called_once_with(
             f"look, {self.dog} caught a beautiful stick"
         )
+
+    def test_get_studant_by_number(self):
+        dog_school = DogSchool(tricks=[])
+        dog_school.teach(self.dog)
+
+        self.assertEqual(dog_school.studants, {1: self.dog})
+        self.assertEqual(dog_school.get_student_by_number(1), self.dog)
+        with self.assertRaises(ValueError):
+            dog_school.get_student_by_number(999)
