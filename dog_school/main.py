@@ -35,13 +35,12 @@ class DogSchool:
         self.students = {}
 
     def teach(self, dog: Dog) -> int:
-        dog_number = self.__add_student(dog)
         for t in self.trick_classes:
             dog.learn_trick(t)
-        return dog_number
+        return self.__add_student(dog)
 
     def __add_student(self, dog) -> int:
-        number = max(self.students.keys(), default=1)
+        number = get_next_pk(self.students)
         self.students[number] = dog
         return number
 
@@ -78,6 +77,10 @@ class Trick(Protocol):
     def __init__(self, dog: Dog): ...
 
     def __call__(self, **kwargs: Any) -> Any: ...
+
+
+def get_next_pk(storage: dict[int, Any]) -> int:
+    return max(storage.keys(), default=0) + 1
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from unittest import TestCase, mock
 
-from dog_school.main import CatchStick, Dog, DogSchool, FakeDead
+from dog_school.main import CatchStick, Dog, DogSchool, FakeDead, get_next_pk
 
 
 class TestTricks(TestCase):
@@ -49,3 +49,7 @@ class TestTricks(TestCase):
         self.assertEqual(dog_school.get_student_by_number(1), self.dog)
         with self.assertRaises(ValueError):
             dog_school.get_student_by_number(999)
+
+    def test_next_pk(self):
+        pk = get_next_pk({99: mock.Mock(), 1: mock.Mock(), -5: mock.Mock()})
+        self.assertEqual(100, pk)
