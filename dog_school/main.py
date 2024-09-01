@@ -3,16 +3,19 @@ from collections.abc import Callable
 from typing import Any, Protocol
 
 
-class Dog:
-    def __init__(self, name: str, output_channel: Callable[[str], None | str] = print):
-        self.name = name
-        self.output_channel = output_channel
-        self.tricks = {"talk": self.talk}
+class Dog:                                                                                      # Define Dog class
+    def __init__(self, name: str, output_channel: Callable[[str], None | str] = print):         # Constructor method lists args needed to instantiate object of this class
+                                                                                                    # name must be string
+                                                                                                    # output_channel ??
 
-    def __str__(self):
+        self.name = name                                                                        # Assign constructor perameter name to self
+        self.output_channel = output_channel                                                    # Assign constructor perameter output_channel to self
+        self.tricks = {"talk": self.talk}                                                       # Assign class method to self
+
+    def __str__(self):                                                                          # Dunder str method is used to define a human-readable string representation of an object.                                             
         return f"<{self.name}, the dog>"
 
-    def talk(self):
+    def talk(self):                                                                             # 
         self.output_channel("woof woof")
 
     def perform_trick(self, trick_name: str, **kwargs: Any):
