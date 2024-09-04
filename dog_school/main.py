@@ -3,21 +3,40 @@ from collections.abc import Callable
 from typing import Any, Protocol
 
 
-class Dog:                                                                                      # Define Dog class
-    def __init__(self, name: str, output_channel: Callable[[str], None | str] = print):         # Constructor method lists args needed to instantiate object of this class
-                                                                                                    # name must be string
-                                                                                                    # output_channel ??
+"""
+Dog Class represents a dog that can perform tricks
+Attributes
+    name
+    output_channel: Callable (like a function) that outputs a string.  Set to default to print function.
+        - Callable represents and object that can be called like a function.  (built in function like print, user-defined function, lambda, or even instance of class that implements _call_)
+        - You can call it just like a function.  It can accept args and return a value or perform an action based on those args.
+        - output_channel is more of a "placeholder" or reference to any callable object.  Actual functions are specific fixed objects in Python, but Callable could point to any function or callable object
+        - output_channel could be a method of a class, or instance of a callable class so it might have state.
+        - USE CASE: Dependency injection - makes the Dog class more flexible and easier to test.  EX: Instead of print, in our tests we could inject a function that collects output messages to a list instead
+        - USE CASE: Customize behaviour - if used in the UI, output_channel could update a test field instead of printing to console.
+        - USE CASE: Logging - Allows you to easily integrate logging into your classes by passing a logging function/loggers info or error method
+        - USE CASE: Multi-environ compatibility - Can use different Callables for dev, staging, prod
+        - USE CASE: Asynch programming - output_channel could be asynchronous, allowing it to be non-blocking
+Methods
+    __init__: initializes dog w/ name, optional output channel (print is default), setuls default talk trick in dict that calls the talk method
+    __str__: returns a string representation of the dog
+    talk: method that makes the dog speak
+    perform_trick: takes trick name and any additional args, finds corresponding trick in tricks dict and executes.  If the trick is not known, it outputs a message stating so
+    learn_trick: Accepts a trick class, creates an instace of the trick associated with the dog, and adds it to the tricks dictionary
+"""
 
-        self.name = name                                                                        # Assign constructor perameter name to self
-        self.output_channel = output_channel                                                    # Assign constructor perameter output_channel to self
-        self.tricks = {"talk": self.talk}                                                       # Assign class method to self
+class Dog:                                                                                      
+    def __init__(self, name: str, output_channel: Callable[[str], None | str] = print):         
+        self.name = name
+        self.output_channel = output_channel
+        self.tricks = {"talk": self.talk}
 
-    def __str__(self):                                                                          # Dunder str method is used to define a human-readable string representation of an object.                                             
+    def __str__(self):
         return f"<{self.name}, the dog>"
 
-    def talk(self):                                                                             # 
+    def talk(self):                                                                             
         self.output_channel("woof woof")
-
+        
     def perform_trick(self, trick_name: str, **kwargs: Any):
         try:
             self.tricks[trick_name](**kwargs)
@@ -28,6 +47,17 @@ class Dog:                                                                      
         trick = trick_class(self)
         self.tricks[trick.name] = trick
 
+"""
+DogSchool class represents a schoole where dogs learn tricks
+Attributes
+    trick_classes: A list of classes that define tricks
+    students: A dict mapping unique student number to Dog instance
+Methods
+    __init__: Initializes the schoold with a list of tricks provided, and setups empty dict for students
+    teach: Takes Dog instance and teaches it all tricks in tick_classes list, then adds the dog to the school's students dict and returns unique student number
+    __add_student: Private method that adds a dog to the students dictionary with a unique number
+    get_student_by_number: Returns a Dog instance by its studnet number or raises error if number doesn't exist
+"""
 
 class DogSchool:
     trick_classes: list[Trick]
@@ -53,6 +83,15 @@ class DogSchool:
         except KeyError:
             raise ValueError(f"There is no Dog with number {number}")
 
+"""
+FakeDead and CatchStick Classes represent specific tricks that a dog can learn
+Attributes
+    name
+    dog: reference to the Dog instance performing the trick
+Methods
+    __init__: Initializes the trick with a reference to a Dog instance
+    __call__: Executes the trick action
+"""
 
 class FakeDead:
     name = "fake_dead"
@@ -73,6 +112,10 @@ class CatchStick:
     def __call__(self, stick: str = "some stick", **_: Any) -> Any:
         self.dog.output_channel(f"look, {self.dog} caught {stick}")
 
+
+"""
+Trick Protocol defines an interface or contract for all tricks.  Ensures any trick class has a name, an __init__ accepting a Dog, and a __call__ to perform the trick.
+"""
 
 class Trick(Protocol):
     name: str
