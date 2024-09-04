@@ -1,6 +1,7 @@
 from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Protocol
+import random
 
 
 """
@@ -26,10 +27,12 @@ Methods
 """
 
 class Dog:                                                                                      
-    def __init__(self, name: str, output_channel: Callable[[str], None | str] = print):         
+    def __init__(self, name: str, obedience_level: int, output_channel: Callable[[str], None | str] = print):         
         self.name = name
+        self.obedience_level = obedience_level
         self.output_channel = output_channel
         self.tricks = {"talk": self.talk}
+        
 
     def __str__(self):
         return f"<{self.name}, the dog>"
@@ -39,7 +42,10 @@ class Dog:
         
     def perform_trick(self, trick_name: str, **kwargs: Any):
         try:
-            self.tricks[trick_name](**kwargs)
+            if success_or_fail(self.obedience_level):
+                self.tricks[trick_name](**kwargs)
+            else:
+                self.output_channel(f"{self} knows how to do {self.tricks[trick_name]}, I swear.  We should try again!")
         except KeyError:
             self.output_channel(f"{self} doesn't know how to {trick_name}")
 
@@ -70,6 +76,8 @@ class DogSchool:
     def teach(self, dog: Dog) -> int:
         for t in self.trick_classes:
             dog.learn_trick(t)
+        if dog.obedience_level <= 5:
+            dog.obedience_level += 1
         return self.__add_student(dog)
 
     def __add_student(self, dog) -> int:
@@ -96,6 +104,9 @@ Methods
 class FakeDead:
     name = "fake_dead"
 
+    def __str__(self):
+        return f"<{self.name}>"
+
     def __init__(self, dog: Dog):
         self.dog = dog
 
@@ -106,6 +117,9 @@ class FakeDead:
 class CatchStick:
     name = "catch_stick"
 
+    def __str__(self):
+        return f"<{self.name}>"
+
     def __init__(self, dog: Dog):
         self.dog = dog
 
@@ -114,6 +128,9 @@ class CatchStick:
 
 class ShakeHand:
     name = "shake_hand"
+
+    def __str__(self):
+        return f"<{self.name}>"
 
     def __init__(self, dog: Dog):
         self.dog = dog
@@ -129,6 +146,8 @@ Trick Protocol defines an interface or contract for all tricks.  Ensures any tri
 class Trick(Protocol):
     name: str
 
+    def __str__(self) -> str: ...
+
     def __init__(self, dog: Dog): ...
 
     def __call__(self, **kwargs: Any) -> Any: ...
@@ -140,6 +159,13 @@ get_next_pk is a helper function designed to return the next id in the students 
 def get_next_pk(storage: dict[int, Any]) -> int:
     return max(storage.keys(), default=0) + 1
 
+"""
+determine_success_or_fail takes int (obedience level) and returns True if trick should be performed, false if not.
+"""
+def success_or_fail(success_rate: int) -> bool:
+    success_threshold = success_rate / 5
+    success_instance = random.random()
+    return success_instance < success_threshold
 
 if __name__ == "__main__":
     """
@@ -155,6 +181,7 @@ if __name__ == "__main__":
 
     ############### MY EXAMPLES ##########################################
 
+    """
     dog2 = Dog("Rover")                                                     # Initialize Rover
     dog2.tricks["talk"]()                                                   # Rover by default can talk
     dog2.perform_trick("fake_dead")                                         # Rover does not know how to fake_dead yet
@@ -168,12 +195,60 @@ if __name__ == "__main__":
     
     for t in dog2.tricks:                                                   # Show us all your tricks Rover -> good boy
         dog2.perform_trick(t)
+    """
 
 
     """
     CURIOUS QUESTIONS:
     - Why is it better to have each trick as its own class, instead of a class with tricks listed in it?
-    - My dog is not the most obedient dog in the world.  It will successfully complete a trick 4/5 times.  How can I implement this?
+        Encapsulation: Each trick encapsulates all the logic needed for a trick, zero dependency on external code, and easier to manage and maintain.
+        Extensibility: Easy to add new tricks without modifying existing code.
+        Polymorphism: Dog class (or any other animal class) can interact with trick without known specifics of how its implemented.  More flexible and dynamic behaviour.
+        Reusability: Any animal can perform a trick.
+        Separation of Concerns: A dog can perform a trick, but a trick isn't part of a dog by default.  Same for DogSchools -> they teach tricks, but the tricks can vary between school.
+
+    - My dog is not the most obedient dog in the world.  It will successfully complete a trick x/5 times.  How can I implement this?
+        I think obediency should be built into a dog, not the trick.  This way obedience can vary between dogs.
+        Sending the dog to DogSchool should maybe increase their base obedient instance variable +1
+
     - I want to reward the dog with a treat each time it completes a trick successfully.  How can I implement this?
+        Giving the dog a treat should maybe increase their base obedience instance variable by +.2
+
     - Dogs like to go for a walk.  If I wanted to implement this as well, dog should be able to execute a walk, but walk should be its own class?
+    """
+
+    ###################### MY OBEDIENCE EXAMPLES ###############################
+
+    dog3 = Dog("Mozart", 0)                                                 # Initialize Mozart, he is not obedient at all!
+    dog3.tricks["talk"]()                                                   # Mozart by default can talk so it will always work.  We can move "talk" to be its own trick class and leared through school if we want otherwise.
+    dog3.perform_trick("fake_dead")                                         # Mozart does not know how to fake_dead yet
+    dog3.learn_trick(FakeDead)                                              # We teach Mozart just to fake_dead
+    dog3.perform_trick("fake_dead")                                         # Mozart can fake_dead now, but will he?
+    dog3.perform_trick("shake_hand")                                        # Mozart doesn't know how to shake_hand
+
+    viks_dog_school = DogSchool([FakeDead, CatchStick, ShakeHand])          # a DogSchool is initialized - we teach 3 tricks AND increase obedience by 1!
+    training = viks_dog_school.teach(dog3)                                  # We send Mozart to viks_dog_school to learn                            
+    dog3.perform_trick("shake_hand")                                        # Mozart now knows how to shake_hand
+
+    for t in dog3.tricks:                                                   # Show us all your tricks Mozart -> good boy?
+        dog3.perform_trick(t)
+
+    
+    print(f"{dog3} has a lvl {dog3.obedience_level} obedience")
+    print("Hmmm, we need some training")
+    
+    training = viks_dog_school.teach(dog3)
+    training = viks_dog_school.teach(dog3)
+    training = viks_dog_school.teach(dog3)
+
+    for t in dog3.tricks:                                                   # Show us all your tricks Mozart -> Much better?
+        dog3.perform_trick(t)
+
+    print(f"{dog3} has a lvl {dog3.obedience_level} obedience")
+    print("Much better!")
+
+    """
+    MORE CURIOUS QUESTIONS:
+    - Tricks seem very similar here and feel like they go against DRY.  Is is better to implement a parent/super class here maybe instead of the Protocol?
+
     """
