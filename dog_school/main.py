@@ -41,7 +41,7 @@ class Dog:
         try:
             self.tricks[trick_name](**kwargs)
         except KeyError:
-            self.output_channel(f"{self} don't know how to {trick_name}")
+            self.output_channel(f"{self} doesn't know how to {trick_name}")
 
     def learn_trick(self, trick_class: Trick):
         trick = trick_class(self)
@@ -112,6 +112,15 @@ class CatchStick:
     def __call__(self, stick: str = "some stick", **_: Any) -> Any:
         self.dog.output_channel(f"look, {self.dog} caught {stick}")
 
+class ShakeHand:
+    name = "shake_hand"
+
+    def __init__(self, dog: Dog):
+        self.dog = dog
+
+    def __call__(self, **_Any) -> Any:
+        self.dog.output_channel(f"look, {self.dog} has extended a paw")
+
 
 """
 Trick Protocol defines an interface or contract for all tricks.  Ensures any trick class has a name, an __init__ accepting a Dog, and a __call__ to perform the trick.
@@ -133,12 +142,38 @@ def get_next_pk(storage: dict[int, Any]) -> int:
 
 
 if __name__ == "__main__":
-    dog = Dog("Fluffy")
-    dog_school = DogSchool([FakeDead, CatchStick])
+    """
+    dog = Dog("Fluffy")                                             # We initalize the dog Fluffy
+    dog_school = DogSchool([FakeDead, CatchStick, ShakeHand])                  # We initalize the dog school with the existing trick classes
+    enrolling_number = dog_school.teach(dog)                        # We teach the dog Fluffy the tricks and assign him to an enrolling number
 
-    enrolling_number = dog_school.teach(dog)
-
-    for t in dog.tricks:
+    for t in dog.tricks:                                            # We iterate throug Fluffy's tricks and perform them.
         dog.perform_trick(t)
 
-    print(dog_school.get_student_by_number(enrolling_number))
+    print(dog_school.get_student_by_number(enrolling_number))       # We print the Fluffy object
+    """
+
+    ############### MY EXAMPLES ##########################################
+
+    dog2 = Dog("Rover")                                                     # Initialize Rover
+    dog2.tricks["talk"]()                                                   # Rover by default can talk
+    dog2.perform_trick("fake_dead")                                         # Rover does not know how to fake_dead yet
+    dog2.learn_trick(FakeDead)                                              # We teach Rover just to fake_dead
+    dog2.perform_trick("fake_dead")                                         # Rover can fake_dead now
+    dog2.perform_trick("shake_hand")                                        # Rover doesn't know how to shake_hand
+
+    viks_dog_school = DogSchool([FakeDead, CatchStick, ShakeHand])          # a DogSchool is initialized - we teach 3 tricks
+    enrolled_dog_2 = viks_dog_school.teach(dog2)                            # We send Rover to viks_dog_school to learn                            
+    dog2.perform_trick("shake_hand")                                        # Rover now knows how to shake_hand
+    
+    for t in dog2.tricks:                                                   # Show us all your tricks Rover -> good boy
+        dog2.perform_trick(t)
+
+
+    """
+    CURIOUS QUESTIONS:
+    - Why is it better to have each trick as its own class, instead of a class with tricks listed in it?
+    - My dog is not the most obedient dog in the world.  It will successfully complete a trick 4/5 times.  How can I implement this?
+    - I want to reward the dog with a treat each time it completes a trick successfully.  How can I implement this?
+    - Dogs like to go for a walk.  If I wanted to implement this as well, dog should be able to execute a walk, but walk should be its own class?
+    """
