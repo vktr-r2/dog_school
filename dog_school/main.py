@@ -125,6 +125,9 @@ class Trick(Protocol):
     def __call__(self, **kwargs: Any) -> Any: ...
 
 
+"""
+get_next_pk is a helper function designed to return the next id in the students dict (or any dict).  Finds max existing key and adds 1.
+"""
 def get_next_pk(storage: dict[int, Any]) -> int:
     return max(storage.keys(), default=0) + 1
 
