@@ -42,10 +42,11 @@ class Dog:
         
     def perform_trick(self, trick_name: str, **kwargs: Any):
         try:
-            if success_or_fail(self.obedience_level):
-                self.tricks[trick_name](**kwargs)
-            else:
-                self.output_channel(f"{self} knows how to do {self.tricks[trick_name]}, I swear.  We should try again!")
+            if self.tricks[trick_name]:
+                if success_or_fail(self.obedience_level):
+                    self.tricks[trick_name](**kwargs)
+                else:
+                    self.output_channel(f"{self} knows how to {trick_name}, I swear.  We should try again!")
         except KeyError:
             self.output_channel(f"{self} doesn't know how to {trick_name}")
 
@@ -213,8 +214,11 @@ if __name__ == "__main__":
 
     - I want to reward the dog with a treat each time it completes a trick successfully.  How can I implement this?
         Giving the dog a treat should maybe increase their base obedience instance variable by +.2
+        This is a great idea but it seems like reward dog should be a method of a human, and then we open up slipery slope with a Human class ex. which dog do they own, giving commands to dog etc.
+        Dog class can have a receive_treat method that would maybe cause them to wag their tail and then increment obedience instance variable, but this seems unnecissary for this excersize.
 
     - Dogs like to go for a walk.  If I wanted to implement this as well, dog should be able to execute a walk, but walk should be its own class?
+        I believe walk should be a class representing the action, and Dog class should implement a method that executes the action.  That way we can make many different action classes?
     """
 
     ###################### MY OBEDIENCE EXAMPLES ###############################
@@ -250,5 +254,6 @@ if __name__ == "__main__":
     """
     MORE CURIOUS QUESTIONS:
     - Tricks seem very similar here and feel like they go against DRY.  Is is better to implement a parent/super class here maybe instead of the Protocol?
+        The protocol is more flexible and allows easier changes to the code in the long run.  The super class would be more strict, which isn't necissarily wrong either - it depends on the scenario.
 
     """
