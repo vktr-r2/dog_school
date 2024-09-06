@@ -255,5 +255,5 @@ if __name__ == "__main__":
     MORE CURIOUS QUESTIONS:
     - Tricks seem very similar here and feel like they go against DRY.  Is is better to implement a parent/super class here maybe instead of the Protocol?
         The protocol is more flexible and allows easier changes to the code in the long run.  The super class would be more strict, which isn't necissarily wrong either - it depends on the scenario.
-
+        Test
     """
